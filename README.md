@@ -55,7 +55,8 @@
 
 ```
 CyberArsenal/
-├── index.html        # Main platform (single-file app)
+├── docs/
+├──────index.html        # Main platform (single-file app)
 ├── README.md         # This file
 └── _config.yml       # GitHub Pages configuration
 ```
