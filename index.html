@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CyberArsenal — Open Source Security Tools</title>
+  <meta name="description" content="The definitive collection of open-source cybersecurity tools. Built by SiteQ8 for the security community."/>
+  <meta name="author" content="SiteQ8"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #020c10;
+      --bg2:      #071520;
+      --bg3:      #0b1f2e;
+      --border:   #0f3d5c;
+      --accent:   #00ffe7;
+      --accent2:  #00a8ff;
+      --red:      #ff3e5f;
+      --yellow:   #ffd966;
+      --green:    #00ff88;
+      --purple:   #b06bff;
+      --text:     #c8e6f0;
+      --muted:    #4a7a94;
+      --glow:     0 0 20px rgba(0,255,231,0.25);
+      --glow2:    0 0 40px rgba(0,255,231,0.12);
+      --card-bg:  rgba(7,21,32,0.85);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Exo 2', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── SCANLINE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,255,231,0.015) 2px,
+        rgba(0,255,231,0.015) 4px
+      );
+    }
+
+    /* ─── ANIMATED BG GRID ─── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,255,231,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,231,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridPulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes gridPulse {
+      from { opacity: 0.5; }
+      to   { opacity: 1; }
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(2,12,16,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--accent);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center;
+      animation: pulse 3s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,231,0.4); }
+      50%       { box-shadow: 0 0 0 8px rgba(0,255,231,0); }
+    }
+
+    .logo-text {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .logo-text span { color: var(--text); }
+
+    nav { display: flex; align-items: center; gap: 8px; }
+
+    .nav-link {
+      color: var(--muted); font-size: .85rem; font-weight: 600;
+      text-decoration: none; padding: 6px 14px;
+      border: 1px solid transparent; border-radius: 4px;
+      letter-spacing: 1px; text-transform: uppercase;
+      transition: all .2s;
+    }
+
+    .nav-link:hover {
+      color: var(--accent); border-color: var(--border);
+      background: rgba(0,255,231,0.05);
+    }
+
+    .btn-contact {
+      background: transparent; border: 1px solid var(--accent);
+      color: var(--accent); padding: 6px 16px; border-radius: 4px;
+      font-family: 'Rajdhani', sans-serif; font-size: .85rem;
+      font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; text-decoration: none;
+      transition: all .2s;
+    }
+
+    .btn-contact:hover {
+      background: var(--accent); color: var(--bg);
+      box-shadow: var(--glow);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative; z-index: 1;
+      padding: 80px 2rem 60px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border);
+      background: rgba(0,255,231,0.04);
+      padding: 6px 16px; border-radius: 100px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem; color: var(--accent); letter-spacing: 2px;
+      margin-bottom: 28px;
+      animation: fadeUp .6s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: blink 1.5s step-end infinite;
+    }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    .hero h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 700; line-height: 1.05;
+      letter-spacing: -1px;
+      animation: fadeUp .7s .1s ease both;
+    }
+
+    .hero h1 .line1 { color: var(--text); display: block; }
+    .hero h1 .line2 {
+      color: var(--accent);
+      display: block;
+      text-shadow: 0 0 60px rgba(0,255,231,0.4);
+    }
+
+    .hero p {
+      max-width: 580px; margin: 24px auto 0;
+      font-size: 1.05rem; color: var(--muted); line-height: 1.7;
+      font-weight: 300;
+      animation: fadeUp .8s .2s ease both;
+    }
+
+    .hero-stats {
+      display: flex; justify-content: center; gap: 48px;
+      margin-top: 48px;
+      animation: fadeUp .9s .3s ease both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 2.2rem; font-weight: 700;
+      color: var(--accent);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: .75rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    /* ─── SEARCH / FILTER BAR ─── */
+    .controls {
+      position: relative; z-index: 2;
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 2rem 32px;
+    }
+
+    .search-wrap {
+      position: relative; margin-bottom: 20px;
+    }
+
+    .search-icon {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-size: 1rem; pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .95rem;
+      padding: 14px 16px 14px 44px;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    #searchInput:focus {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+
+    #searchInput::placeholder { color: var(--muted); }
+
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+
+    .filter-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 16px; border-radius: 100px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .8rem; font-weight: 600; letter-spacing: 1px;
+      cursor: pointer; transition: all .2s;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .filter-btn .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      color: var(--accent); border-color: var(--accent);
+      background: rgba(0,255,231,0.07);
+      box-shadow: 0 0 12px rgba(0,255,231,0.15);
+    }
+
+    /* ─── TOOLS GRID ─── */
+    .main {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 2rem 80px;
+    }
+
+    .section-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 24px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 3px;
+      color: var(--muted);
+    }
+
+    .section-count {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem; color: var(--accent);
+      background: rgba(0,255,231,0.08);
+      border: 1px solid rgba(0,255,231,0.2);
+      padding: 2px 10px; border-radius: 100px;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    /* ─── TOOL CARD ─── */
+    .tool-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+      position: relative; overflow: hidden;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+      cursor: default;
+      animation: fadeUp .4s ease both;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cat-color, var(--accent)), transparent);
+      opacity: 0; transition: opacity .3s;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--cat-color, var(--accent));
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(0,255,231,0.08);
+    }
+
+    .tool-card:hover::before { opacity: 1; }
+
+    .card-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .card-name-wrap { flex: 1; }
+
+    .tool-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: #e8f4f8; letter-spacing: .5px;
+    }
+
+    .tool-category {
+      display: inline-block;
+      font-size: .65rem; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 2px 8px; border-radius: 3px;
+      margin-top: 4px;
+      background: rgba(0,255,231,0.08);
+      color: var(--cat-color, var(--accent));
+      border: 1px solid var(--cat-color, var(--accent));
+      opacity: 0.8;
+    }
+
+    .card-actions {
+      display: flex; gap: 6px; flex-shrink: 0; margin-left: 12px;
+    }
+
+    .card-link {
+      width: 30px; height: 30px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+      color: var(--muted); text-decoration: none;
+      transition: all .2s; font-size: .85rem;
+    }
+
+    .card-link:hover {
+      color: var(--accent); border-color: var(--accent);
+      background: rgba(0,255,231,0.06);
+    }
+
+    .tool-desc {
+      font-size: .88rem; color: var(--muted); line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .card-tags {
+      display: flex; flex-wrap: wrap; gap: 5px;
+      margin-bottom: 14px;
+    }
+
+    .tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem; color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 2px 8px; border-radius: 3px;
+    }
+
+    .card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid rgba(15,61,92,0.5);
+    }
+
+    .card-lang {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .75rem; color: var(--muted);
+    }
+
+    .lang-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+
+    .card-stars {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem; color: var(--muted);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .card-stars svg { color: var(--yellow); }
+
+    /* No results */
+    .no-results {
+      text-align: center; padding: 80px 20px;
+      color: var(--muted);
+      display: none;
+    }
+
+    .no-results h3 {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem; margin-bottom: 8px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px 2rem;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+
+    .footer-logo {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--accent); letter-spacing: 3px; text-transform: uppercase;
+    }
+
+    .footer-text {
+      font-size: .82rem; color: var(--muted); line-height: 1.6;
+    }
+
+    .footer-text a {
+      color: var(--accent); text-decoration: none;
+    }
+
+    .footer-links {
+      display: flex; gap: 20px;
+    }
+
+    .footer-links a {
+      color: var(--muted); text-decoration: none; font-size: .82rem;
+      transition: color .2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .hero-stats { gap: 28px; }
+      .tools-grid { grid-template-columns: 1fr; }
+      nav { display: none; }
+      .hero { padding: 50px 1.5rem 40px; }
+    }
+
+    /* ─── CATEGORY COLORS ─── */
+    .cat-network   { --cat-color: #00ffe7; }
+    .cat-web       { --cat-color: #00a8ff; }
+    .cat-exploit   { --cat-color: #ff3e5f; }
+    .cat-forensics { --cat-color: #b06bff; }
+    .cat-malware   { --cat-color: #ff6b35; }
+    .cat-osint     { --cat-color: #ffd966; }
+    .cat-password  { --cat-color: #00ff88; }
+    .cat-wireless  { --cat-color: #ff9bf5; }
+    .cat-reverse   { --cat-color: #4ecdc4; }
+    .cat-cloud     { --cat-color: #45b7d1; }
+    .cat-social    { --cat-color: #f7797d; }
+    .cat-crypto    { --cat-color: #c6ea8d; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#020c10">
+        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5L12 1z"/>
+      </svg>
+    </div>
+    <span class="logo-text">Cyber<span>Arsenal</span></span>
+  </a>
+  <nav>
+    <a class="nav-link" href="#tools">Tools</a>
+    <a class="nav-link" href="https://github.com/SiteQ8" target="_blank">GitHub</a>
+    <a class="nav-link btn-contact" href="mailto:site@hotmail.com">Contact</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">⬡ OPEN SOURCE SECURITY TOOLKIT v2.0</div>
+  <h1>
+    <span class="line1">The Definitive</span>
+    <span class="line2">Cyber Arsenal</span>
+  </h1>
+  <p>Every open-source cybersecurity tool you need — organized, searchable, and battle-tested by the global security community.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num" id="totalCount">0</span>
+      <span class="stat-label">Tools</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">12</span>
+      <span class="stat-label">Categories</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Open Source</span>
+    </div>
+  </div>
+</section>
+
+<!-- CONTROLS -->
+<div class="controls" id="tools">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Search tools, categories, tags..."/>
+  </div>
+  <div class="filters" id="filterBtns">
+    <button class="filter-btn active" data-cat="all">
+      <span class="dot" style="background:#00ffe7"></span> All Tools
+    </button>
+    <button class="filter-btn" data-cat="network">
+      <span class="dot" style="background:#00ffe7"></span> Network
+    </button>
+    <button class="filter-btn" data-cat="web">
+      <span class="dot" style="background:#00a8ff"></span> Web App
+    </button>
+    <button class="filter-btn" data-cat="exploit">
+      <span class="dot" style="background:#ff3e5f"></span> Exploitation
+    </button>
+    <button class="filter-btn" data-cat="forensics">
+      <span class="dot" style="background:#b06bff"></span> Forensics
+    </button>
+    <button class="filter-btn" data-cat="malware">
+      <span class="dot" style="background:#ff6b35"></span> Malware Analysis
+    </button>
+    <button class="filter-btn" data-cat="osint">
+      <span class="dot" style="background:#ffd966"></span> OSINT
+    </button>
+    <button class="filter-btn" data-cat="password">
+      <span class="dot" style="background:#00ff88"></span> Password
+    </button>
+    <button class="filter-btn" data-cat="wireless">
+      <span class="dot" style="background:#ff9bf5"></span> Wireless
+    </button>
+    <button class="filter-btn" data-cat="reverse">
+      <span class="dot" style="background:#4ecdc4"></span> Reverse Eng.
+    </button>
+    <button class="filter-btn" data-cat="cloud">
+      <span class="dot" style="background:#45b7d1"></span> Cloud/Container
+    </button>
+    <button class="filter-btn" data-cat="social">
+      <span class="dot" style="background:#f7797d"></span> Social Eng.
+    </button>
+    <button class="filter-btn" data-cat="crypto">
+      <span class="dot" style="background:#c6ea8d"></span> Crypto
+    </button>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<main class="main">
+  <div class="section-header">
+    <span class="section-title">Security Tools</span>
+    <span class="section-count" id="visibleCount">Loading…</span>
+  </div>
+  <div class="tools-grid" id="toolsGrid"></div>
+  <div class="no-results" id="noResults">
+    <h3>// NO TOOLS FOUND</h3>
+    <p>Try a different search term or category filter.</p>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">CyberArsenal</div>
+    <p class="footer-text">
+      Built with ❤️ for the security community by <a href="https://github.com/SiteQ8" target="_blank">SiteQ8</a>.
+      All tools listed are open-source and community-maintained.<br/>
+      Contact: <a href="mailto:site@hotmail.com">site@hotmail.com</a>
+    </p>
+    <div class="footer-links">
+      <a href="https://github.com/SiteQ8" target="_blank">GitHub</a>
+      <a href="mailto:site@hotmail.com">Email</a>
+      <a href="#tools">Back to Top</a>
+    </div>
+    <p class="footer-text" style="font-size:.72rem; opacity:.5;">
+      For educational and authorized testing purposes only. Use responsibly.
+    </p>
+  </div>
+</footer>
+
+<script>
+const TOOLS = [
+  // ── NETWORK ──────────────────────────────────────────────────
+  {
+    name: "Nmap",
+    cat: "network",
+    desc: "The world's most widely-used network scanner. Discovers hosts, open ports, services, OS fingerprints and runs NSE scripts for deep reconnaissance.",
+    tags: ["port-scan","discovery","NSE","fingerprinting"],
+    lang: "C", langColor: "#555599",
+    stars: "9.2k",
+    github: "https://github.com/nmap/nmap",
+    url: "https://nmap.org"
+  },
+  {
+    name: "Wireshark",
+    cat: "network",
+    desc: "The world's foremost network protocol analyzer. Capture and interactively browse traffic on a computer network with deep inspection of hundreds of protocols.",
+    tags: ["packet-capture","protocol-analysis","PCAP","live-capture"],
+    lang: "C", langColor: "#555599",
+    stars: "7.1k",
+    github: "https://github.com/wireshark/wireshark",
+    url: "https://www.wireshark.org"
+  },
+  {
+    name: "Masscan",
+    cat: "network",
+    desc: "Mass IP port scanner capable of scanning the entire internet in under 6 minutes. Transmits 10 million packets per second using async I/O.",
+    tags: ["port-scan","high-speed","async","internet-scale"],
+    lang: "C", langColor: "#555599",
+    stars: "22.8k",
+    github: "https://github.com/robertdavidgraham/masscan",
+    url: "https://github.com/robertdavidgraham/masscan"
+  },
+  {
+    name: "Zeek (Bro)",
+    cat: "network",
+    desc: "Powerful framework for network traffic analysis and security monitoring. Generates rich, structured network logs beyond just packet captures.",
+    tags: ["traffic-analysis","IDS","logging","NIDS"],
+    lang: "C++", langColor: "#f34b7d",
+    stars: "6.4k",
+    github: "https://github.com/zeek/zeek",
+    url: "https://zeek.org"
+  },
+  {
+    name: "Snort",
+    cat: "network",
+    desc: "Open-source NIDS/NIPS combining signature, protocol, and anomaly-based detection. The most deployed intrusion detection system in the world.",
+    tags: ["IDS","IPS","signatures","NIDS"],
+    lang: "C", langColor: "#555599",
+    stars: "2.1k",
+    github: "https://github.com/snort3/snort3",
+    url: "https://snort.org"
+  },
+  {
+    name: "Suricata",
+    cat: "network",
+    desc: "High-performance network IDS, IPS and network security monitoring engine. Supports multi-threading, JSON logging, and YAML configuration.",
+    tags: ["IDS","IPS","multi-thread","NSM"],
+    lang: "C", langColor: "#555599",
+    stars: "4.9k",
+    github: "https://github.com/OISF/suricata",
+    url: "https://suricata.io"
+  },
+  {
+    name: "OpenVAS",
+    cat: "network",
+    desc: "Full-featured vulnerability scanner maintained by Greenbone. Provides an extensive feed of Network Vulnerability Tests updated continuously.",
+    tags: ["vuln-scanner","NVT","CVE","assessment"],
+    lang: "C", langColor: "#555599",
+    stars: "3.5k",
+    github: "https://github.com/greenbone/openvas-scanner",
+    url: "https://www.openvas.org"
+  },
+  {
+    name: "Netcat (ncat)",
+    cat: "network",
+    desc: "The Swiss-army knife of networking. Read/write data across network connections using TCP/UDP. Supports SSL, proxy tunneling, and port scanning.",
+    tags: ["tcp","udp","proxy","tunneling"],
+    lang: "C", langColor: "#555599",
+    stars: "1.4k",
+    github: "https://github.com/nmap/nmap",
+    url: "https://nmap.org/ncat"
+  },
+  {
+    name: "tcpdump",
+    cat: "network",
+    desc: "Powerful command-line packet analyzer. Capture live traffic or read saved packet files with Berkeley Packet Filter expressions.",
+    tags: ["packet-capture","BPF","CLI","PCAP"],
+    lang: "C", langColor: "#555599",
+    stars: "2.8k",
+    github: "https://github.com/the-tcpdump-group/tcpdump",
+    url: "https://www.tcpdump.org"
+  },
+  {
+    name: "Angry IP Scanner",
+    cat: "network",
+    desc: "Fast, cross-platform network scanner. Scans IP addresses and ports, resolves hostnames, and supports plugin extensions.",
+    tags: ["IP-scan","port-scan","GUI","cross-platform"],
+    lang: "Java", langColor: "#b07219",
+    stars: "3.9k",
+    github: "https://github.com/angryip/ipscan",
+    url: "https://angryip.org"
+  },
+
+  // ── WEB APP ───────────────────────────────────────────────────
+  {
+    name: "OWASP ZAP",
+    cat: "web",
+    desc: "The world's most widely-used web app scanner. Provides automated and manual testing for finding security vulnerabilities in web apps during development.",
+    tags: ["DAST","spider","proxy","fuzzer"],
+    lang: "Java", langColor: "#b07219",
+    stars: "12.4k",
+    github: "https://github.com/zaproxy/zaproxy",
+    url: "https://www.zaproxy.org"
+  },
+  {
+    name: "SQLmap",
+    cat: "web",
+    desc: "Automatic SQL injection detection and exploitation tool. Supports MySQL, Oracle, PostgreSQL, MSSQL, SQLite and more with database takeover features.",
+    tags: ["SQLi","database","injection","automation"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "32.5k",
+    github: "https://github.com/sqlmapproject/sqlmap",
+    url: "https://sqlmap.org"
+  },
+  {
+    name: "Nikto",
+    cat: "web",
+    desc: "Web server scanner that performs comprehensive tests against web servers for dangerous files, outdated server software, and version-specific problems.",
+    tags: ["web-scan","CVE","headers","SSL"],
+    lang: "Perl", langColor: "#0298c3",
+    stars: "8.3k",
+    github: "https://github.com/sullo/nikto",
+    url: "https://cirt.net/Nikto2"
+  },
+  {
+    name: "Gobuster",
+    cat: "web",
+    desc: "Directory/file, DNS, and Virtual Host busting tool. Fast and concurrent with support for wordlists, extensions, and custom status codes.",
+    tags: ["directory-brute","DNS","vhost","fuzzing"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "10.1k",
+    github: "https://github.com/OJ/gobuster",
+    url: "https://github.com/OJ/gobuster"
+  },
+  {
+    name: "Feroxbuster",
+    cat: "web",
+    desc: "Fast, recursive content discovery tool written in Rust. Incredibly fast directory bruting with intelligent wildcard detection and recursion.",
+    tags: ["directory-brute","recursive","Rust","fast"],
+    lang: "Rust", langColor: "#dea584",
+    stars: "5.9k",
+    github: "https://github.com/epi052/feroxbuster",
+    url: "https://github.com/epi052/feroxbuster"
+  },
+  {
+    name: "XSStrike",
+    cat: "web",
+    desc: "Advanced XSS detection suite featuring fuzzer, manual payload crafting, and intelligent parameter analysis with DOM XSS support.",
+    tags: ["XSS","DOM","fuzzing","bypass"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "13.2k",
+    github: "https://github.com/s0md3v/XSStrike",
+    url: "https://github.com/s0md3v/XSStrike"
+  },
+  {
+    name: "Wfuzz",
+    cat: "web",
+    desc: "Web application fuzzer designed for brute-forcing GET/POST parameters, forms, directories, headers, and any HTTP element with powerful filter options.",
+    tags: ["fuzzer","brute-force","HTTP","filter"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "5.4k",
+    github: "https://github.com/xmendez/wfuzz",
+    url: "https://wfuzz.readthedocs.io"
+  },
+  {
+    name: "ffuf",
+    cat: "web",
+    desc: "Fast web fuzzer written in Go. Supports multiple wordlists, custom headers, POST data, rate limiting, and silent mode with JSON output.",
+    tags: ["fuzzer","directory","API","fast"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "12.8k",
+    github: "https://github.com/ffuf/ffuf",
+    url: "https://github.com/ffuf/ffuf"
+  },
+  {
+    name: "Nuclei",
+    cat: "web",
+    desc: "Fast vulnerability scanner based on YAML templates. Scans for misconfiguration, CVEs, OAST, and exposure across thousands of community-built templates.",
+    tags: ["templates","CVE","YAML","fast"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "21.3k",
+    github: "https://github.com/projectdiscovery/nuclei",
+    url: "https://nuclei.projectdiscovery.io"
+  },
+  {
+    name: "Dalfox",
+    cat: "web",
+    desc: "Parameter analysis and XSS scanning tool focused on automation and accuracy. Supports DOM, blind XSS, and pipeline integration.",
+    tags: ["XSS","parameter","blind-XSS","pipeline"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "3.8k",
+    github: "https://github.com/hahwul/dalfox",
+    url: "https://github.com/hahwul/dalfox"
+  },
+
+  // ── EXPLOITATION ──────────────────────────────────────────────
+  {
+    name: "Metasploit Framework",
+    cat: "exploit",
+    desc: "The world's most used penetration testing framework. Provides infrastructure for exploit development, testing, and payload delivery with a massive module library.",
+    tags: ["exploits","payloads","post-exploit","Meterpreter"],
+    lang: "Ruby", langColor: "#701516",
+    stars: "34.1k",
+    github: "https://github.com/rapid7/metasploit-framework",
+    url: "https://www.metasploit.com"
+  },
+  {
+    name: "BeEF",
+    cat: "exploit",
+    desc: "Browser Exploitation Framework. Hooks web browsers through XSS vulnerabilities and enables a range of client-side attacks and information gathering.",
+    tags: ["browser","XSS","hook","client-side"],
+    lang: "Ruby", langColor: "#701516",
+    stars: "9.7k",
+    github: "https://github.com/beefproject/beef",
+    url: "https://beefproject.com"
+  },
+  {
+    name: "RouterSploit",
+    cat: "exploit",
+    desc: "Exploitation framework dedicated to embedded devices including routers, IP cameras, and IoT equipment. Features credential scanners and exploits for common CVEs.",
+    tags: ["IoT","router","embedded","CVE"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "11.9k",
+    github: "https://github.com/threat9/routersploit",
+    url: "https://github.com/threat9/routersploit"
+  },
+  {
+    name: "Empire",
+    cat: "exploit",
+    desc: "Post-exploitation C2 framework with agents for Windows, Linux, and macOS. Provides encrypted comms, module system, and credential harvesting.",
+    tags: ["C2","post-exploit","agents","PowerShell"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "7.5k",
+    github: "https://github.com/EmpireProject/Empire",
+    url: "https://github.com/EmpireProject/Empire"
+  },
+  {
+    name: "searchsploit",
+    cat: "exploit",
+    desc: "Command-line utility for Exploit-DB. Search the world's largest public exploit database for vulnerabilities affecting specific software and versions.",
+    tags: ["exploit-db","CVE","PoC","offline"],
+    lang: "Bash", langColor: "#89e051",
+    stars: "3.8k",
+    github: "https://github.com/offensive-security/exploitdb",
+    url: "https://www.exploit-db.com"
+  },
+  {
+    name: "Covenant",
+    cat: "exploit",
+    desc: "Collaborative .NET C2 framework for red team operations. Features a web-based interface, encrypted channels, and .NET tradecraft.",
+    tags: ["C2",".NET","red-team","collaborative"],
+    lang: "C#", langColor: "#178600",
+    stars: "4.1k",
+    github: "https://github.com/cobbr/Covenant",
+    url: "https://github.com/cobbr/Covenant"
+  },
+  {
+    name: "Impacket",
+    cat: "exploit",
+    desc: "Python library and toolset for working with network protocols. Includes SMB, NTLM, and Kerberos exploitation tools for Windows environments.",
+    tags: ["SMB","NTLM","Kerberos","Windows"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "13.8k",
+    github: "https://github.com/fortra/impacket",
+    url: "https://github.com/fortra/impacket"
+  },
+
+  // ── FORENSICS ─────────────────────────────────────────────────
+  {
+    name: "Autopsy",
+    cat: "forensics",
+    desc: "Digital forensics platform built on The Sleuth Kit. Provides a graphical GUI for analyzing hard drives, analyzing file metadata, and recovering deleted files.",
+    tags: ["disk","recovery","timeline","artifacts"],
+    lang: "Java", langColor: "#b07219",
+    stars: "2.3k",
+    github: "https://github.com/sleuthkit/autopsy",
+    url: "https://www.autopsy.com"
+  },
+  {
+    name: "Volatility 3",
+    cat: "forensics",
+    desc: "Advanced memory forensics framework for extraction of digital artifacts from RAM dumps. Supports Windows, Linux, and macOS memory images.",
+    tags: ["memory","RAM","artifacts","Windows"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "7.4k",
+    github: "https://github.com/volatilityfoundation/volatility3",
+    url: "https://volatility3.readthedocs.io"
+  },
+  {
+    name: "The Sleuth Kit",
+    cat: "forensics",
+    desc: "Collection of command-line tools for forensic analysis of disk images. Analyzes file systems, partitions, and recovers deleted content.",
+    tags: ["disk-image","filesystem","CLI","recovery"],
+    lang: "C", langColor: "#555599",
+    stars: "2.9k",
+    github: "https://github.com/sleuthkit/sleuthkit",
+    url: "https://www.sleuthkit.org"
+  },
+  {
+    name: "ExifTool",
+    cat: "forensics",
+    desc: "Platform-independent Perl library and CLI for reading, writing, and editing metadata in image, audio, video, and document files.",
+    tags: ["metadata","EXIF","image","steganography"],
+    lang: "Perl", langColor: "#0298c3",
+    stars: "4.1k",
+    github: "https://github.com/exiftool/exiftool",
+    url: "https://exiftool.org"
+  },
+  {
+    name: "Binwalk",
+    cat: "forensics",
+    desc: "Firmware analysis tool for searching binary images for embedded files and executable code. Extracts archives, filesystems, and identifies file signatures.",
+    tags: ["firmware","binary","extraction","IoT"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "10.2k",
+    github: "https://github.com/ReFirmLabs/binwalk",
+    url: "https://github.com/ReFirmLabs/binwalk"
+  },
+  {
+    name: "Foremost",
+    cat: "forensics",
+    desc: "Console program for recovering files based on their headers, footers, and data structures. Originally developed by the US Air Force OSI.",
+    tags: ["file-recovery","carving","deleted","headers"],
+    lang: "C", langColor: "#555599",
+    stars: "789",
+    github: "https://github.com/korczis/foremost",
+    url: "https://sourceforge.net/projects/foremost"
+  },
+  {
+    name: "KAPE",
+    cat: "forensics",
+    desc: "Kroll Artifact Parser and Extractor. Rapidly collects and processes forensic artifacts from live systems for triage and incident response.",
+    tags: ["triage","IR","collection","artifacts"],
+    lang: "C#", langColor: "#178600",
+    stars: "1.2k",
+    github: "https://github.com/EricZimmerman/KapeFiles",
+    url: "https://ericzimmerman.github.io/#!index.md"
+  },
+
+  // ── MALWARE ANALYSIS ─────────────────────────────────────────
+  {
+    name: "Cuckoo Sandbox",
+    cat: "malware",
+    desc: "Automated malware analysis system. Automatically analyzes suspicious files, documents, and URLs in an isolated environment with behavioral reporting.",
+    tags: ["sandbox","behavioral","automated","detonation"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "5.8k",
+    github: "https://github.com/cuckoosandbox/cuckoo",
+    url: "https://cuckoosandbox.org"
+  },
+  {
+    name: "YARA",
+    cat: "malware",
+    desc: "Tool for identifying and classifying malware samples. Create rules that describe patterns for malware families using strings, byte sequences, and conditions.",
+    tags: ["rules","patterns","classification","detection"],
+    lang: "C", langColor: "#555599",
+    stars: "8.1k",
+    github: "https://github.com/VirusTotal/yara",
+    url: "https://virustotal.github.io/yara"
+  },
+  {
+    name: "Ghidra",
+    cat: "malware",
+    desc: "NSA's open-source reverse engineering framework. Decompiles, disassembles, and analyzes compiled code across multiple processor architectures.",
+    tags: ["decompiler","disassembler","NSA","RE"],
+    lang: "Java", langColor: "#b07219",
+    stars: "51.2k",
+    github: "https://github.com/NationalSecurityAgency/ghidra",
+    url: "https://ghidra-sre.org"
+  },
+  {
+    name: "Radare2",
+    cat: "malware",
+    desc: "Portable reverse engineering framework providing disassembly, debugging, analysis, emulation, and binary patching for many architectures.",
+    tags: ["disassembler","debugger","emulation","patching"],
+    lang: "C", langColor: "#555599",
+    stars: "20.3k",
+    github: "https://github.com/radareorg/radare2",
+    url: "https://radare.org"
+  },
+  {
+    name: "PEview",
+    cat: "malware",
+    desc: "Lightweight PE header viewer for analyzing Windows executables and DLLs. Ideal for quick static analysis of PE file structure and sections.",
+    tags: ["PE","static","Windows","headers"],
+    lang: "C", langColor: "#555599",
+    stars: "312",
+    github: "https://github.com/p-ranav/pew",
+    url: "http://wjradburn.com/software"
+  },
+  {
+    name: "REMnux",
+    cat: "malware",
+    desc: "Linux distribution for reverse-engineering and analyzing malware. Includes pre-configured tools for static and dynamic malware analysis.",
+    tags: ["distro","static","dynamic","Linux"],
+    lang: "Shell", langColor: "#89e051",
+    stars: "812",
+    github: "https://github.com/REMnux/remnux-cli",
+    url: "https://remnux.org"
+  },
+  {
+    name: "Detect-It-Easy (DiE)",
+    cat: "malware",
+    desc: "Program for determining types of files. Uses signature-based detection with a comprehensive database of packer, compiler, and protector signatures.",
+    tags: ["packer","compiler","identification","signatures"],
+    lang: "C++", langColor: "#f34b7d",
+    stars: "7.2k",
+    github: "https://github.com/horsicq/Detect-It-Easy",
+    url: "https://github.com/horsicq/Detect-It-Easy"
+  },
+
+  // ── OSINT ─────────────────────────────────────────────────────
+  {
+    name: "theHarvester",
+    cat: "osint",
+    desc: "Gathers emails, names, subdomains, IPs, and URLs from public sources including search engines, Shodan, LinkedIn, and many other data sources.",
+    tags: ["email","subdomain","passive","reconnaissance"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "11.6k",
+    github: "https://github.com/laramies/theHarvester",
+    url: "https://github.com/laramies/theHarvester"
+  },
+  {
+    name: "Maltego CE",
+    cat: "osint",
+    desc: "Graphical link analysis tool for gathering and connecting OSINT. Visualizes relationships between domains, IPs, emails, and social media entities.",
+    tags: ["graph","link-analysis","entities","visualization"],
+    lang: "Java", langColor: "#b07219",
+    stars: "1.1k",
+    github: "https://github.com/paterva/maltego-trx",
+    url: "https://www.maltego.com"
+  },
+  {
+    name: "Recon-ng",
+    cat: "osint",
+    desc: "Full-featured web reconnaissance framework with independent modules and database interaction. Similar to Metasploit but focused on OSINT.",
+    tags: ["reconnaissance","modules","web","database"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "3.8k",
+    github: "https://github.com/lanmaster53/recon-ng",
+    url: "https://github.com/lanmaster53/recon-ng"
+  },
+  {
+    name: "SpiderFoot",
+    cat: "osint",
+    desc: "Automates OSINT collection across 200+ data sources. Maps attack surface including IPs, domains, emails, usernames, phone numbers, and more.",
+    tags: ["automated","200+ sources","attack-surface","mapping"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "12.4k",
+    github: "https://github.com/smicallef/spiderfoot",
+    url: "https://www.spiderfoot.net"
+  },
+  {
+    name: "Shodan CLI",
+    cat: "osint",
+    desc: "Command-line interface to the Shodan search engine for Internet-connected devices. Query open ports, services, banners, and vulnerabilities at scale.",
+    tags: ["IoT","search","CVE","banners"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "2.2k",
+    github: "https://github.com/achillean/shodan-python",
+    url: "https://cli.shodan.io"
+  },
+  {
+    name: "Subfinder",
+    cat: "osint",
+    desc: "Fast passive subdomain enumeration tool. Uses passive online sources to discover valid subdomains for websites and provides accurate results silently.",
+    tags: ["subdomain","passive","DNS","enumeration"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "10.3k",
+    github: "https://github.com/projectdiscovery/subfinder",
+    url: "https://github.com/projectdiscovery/subfinder"
+  },
+  {
+    name: "Amass",
+    cat: "osint",
+    desc: "In-depth attack surface mapping and asset discovery tool. Performs DNS enumeration, certificate transparency, and network mapping with graph visualization.",
+    tags: ["DNS","ASN","certificate","attack-surface"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "12.1k",
+    github: "https://github.com/owasp-amass/amass",
+    url: "https://github.com/owasp-amass/amass"
+  },
+
+  // ── PASSWORD ──────────────────────────────────────────────────
+  {
+    name: "Hashcat",
+    cat: "password",
+    desc: "World's fastest and most advanced password recovery utility. Supports GPU acceleration and 300+ hash types including MD5, SHA, WPA, NTLM, and more.",
+    tags: ["GPU","cracking","300+ hashes","wordlist"],
+    lang: "C", langColor: "#555599",
+    stars: "21.4k",
+    github: "https://github.com/hashcat/hashcat",
+    url: "https://hashcat.net"
+  },
+  {
+    name: "John the Ripper",
+    cat: "password",
+    desc: "Classic open-source password security auditing and recovery tool. Detects weak Unix passwords, supports auto-detection, and runs on many platforms.",
+    tags: ["Unix","NTLM","auto-detect","wordlist"],
+    lang: "C", langColor: "#555599",
+    stars: "10.1k",
+    github: "https://github.com/openwall/john",
+    url: "https://www.openwall.com/john"
+  },
+  {
+    name: "Hydra",
+    cat: "password",
+    desc: "Fast and flexible online password cracker supporting 50+ protocols including HTTP, FTP, SSH, SMB, databases, LDAP, and many more.",
+    tags: ["online","brute-force","50+ protocols","network"],
+    lang: "C", langColor: "#555599",
+    stars: "9.6k",
+    github: "https://github.com/vanhauser-thc/thc-hydra",
+    url: "https://github.com/vanhauser-thc/thc-hydra"
+  },
+  {
+    name: "Medusa",
+    cat: "password",
+    desc: "Speedy, massively parallel, modular login brute-forcer. Supports parallel testing of multiple hosts simultaneously.",
+    tags: ["parallel","modular","brute-force","multi-host"],
+    lang: "C", langColor: "#555599",
+    stars: "1.3k",
+    github: "https://github.com/jmk-foofus/medusa",
+    url: "https://github.com/jmk-foofus/medusa"
+  },
+  {
+    name: "CrackMapExec",
+    cat: "password",
+    desc: "Post-exploitation and network pen-testing Swiss army knife for Windows environments. Tests Active Directory credentials across SMB, WinRM, and MSSQL.",
+    tags: ["SMB","AD","credentials","post-exploit"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "9.2k",
+    github: "https://github.com/byt3bl33d3r/CrackMapExec",
+    url: "https://github.com/byt3bl33d3r/CrackMapExec"
+  },
+  {
+    name: "SecLists",
+    cat: "password",
+    desc: "The largest collection of usernames, passwords, URLs, fuzzing payloads, and data used in security assessments. The go-to resource for wordlists.",
+    tags: ["wordlists","payloads","usernames","fuzzing"],
+    lang: "Text", langColor: "#777",
+    stars: "59.3k",
+    github: "https://github.com/danielmiessler/SecLists",
+    url: "https://github.com/danielmiessler/SecLists"
+  },
+
+  // ── WIRELESS ──────────────────────────────────────────────────
+  {
+    name: "Aircrack-ng",
+    cat: "wireless",
+    desc: "Complete suite of tools to assess WiFi network security. Covers monitoring, attacking, testing, and cracking WEP and WPA/WPA2 PSK keys.",
+    tags: ["WiFi","WPA2","cracking","monitoring"],
+    lang: "C", langColor: "#555599",
+    stars: "4.9k",
+    github: "https://github.com/aircrack-ng/aircrack-ng",
+    url: "https://www.aircrack-ng.org"
+  },
+  {
+    name: "Kismet",
+    cat: "wireless",
+    desc: "Wireless network detector, sniffer, and intrusion detection system. Works with WiFi, Bluetooth, BTLE, Zigbee, and many other wireless protocols.",
+    tags: ["sniffer","WIDS","Bluetooth","multi-protocol"],
+    lang: "C++", langColor: "#f34b7d",
+    stars: "3.1k",
+    github: "https://github.com/kismetwireless/kismet",
+    url: "https://kismetwireless.net"
+  },
+  {
+    name: "Wifite2",
+    cat: "wireless",
+    desc: "Automated wireless auditor designed to attack multiple WEP, WPA, and WPS networks in a row. Fully automated attack with dependency checking.",
+    tags: ["automated","WEP","WPS","attack"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "5.1k",
+    github: "https://github.com/derv82/wifite2",
+    url: "https://github.com/derv82/wifite2"
+  },
+  {
+    name: "Bettercap",
+    cat: "wireless",
+    desc: "Swiss army knife for network reconnaissance and attacks. Handles WiFi, BLE, HID, Ethernet, and 802.11 with modular attack framework.",
+    tags: ["MITM","WiFi","BLE","modular"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "16.4k",
+    github: "https://github.com/bettercap/bettercap",
+    url: "https://www.bettercap.org"
+  },
+  {
+    name: "hcxtools",
+    cat: "wireless",
+    desc: "Small tools for converting capture files and manipulating 802.11 packets. Works with PMKID attacks and interfaces with Hashcat for cracking.",
+    tags: ["PMKID","802.11","converter","hashcat"],
+    lang: "C", langColor: "#555599",
+    stars: "1.9k",
+    github: "https://github.com/ZerBea/hcxtools",
+    url: "https://github.com/ZerBea/hcxtools"
+  },
+
+  // ── REVERSE ENGINEERING ───────────────────────────────────────
+  {
+    name: "x64dbg",
+    cat: "reverse",
+    desc: "Open-source x64/x32 debugger for Windows. Features a clean UI, plugin architecture, and focus on malware analysis and reverse engineering.",
+    tags: ["debugger","Windows","x64","plugins"],
+    lang: "C++", langColor: "#f34b7d",
+    stars: "44.1k",
+    github: "https://github.com/x64dbg/x64dbg",
+    url: "https://x64dbg.com"
+  },
+  {
+    name: "Binary Ninja",
+    cat: "reverse",
+    desc: "Reverse engineering platform with IL system, decompiler, and API. The free personal edition is powerful for binary analysis.",
+    tags: ["decompiler","IL","API","binary"],
+    lang: "C++", langColor: "#f34b7d",
+    stars: "1.1k",
+    github: "https://github.com/Vector35/binaryninja-api",
+    url: "https://binary.ninja"
+  },
+  {
+    name: "angr",
+    cat: "reverse",
+    desc: "Python-based binary analysis framework combining static and dynamic symbolic execution for automated bug finding and reverse engineering.",
+    tags: ["symbolic-exec","static","dynamic","Python"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "8.1k",
+    github: "https://github.com/angr/angr",
+    url: "https://angr.io"
+  },
+  {
+    name: "Frida",
+    cat: "reverse",
+    desc: "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers. Hook into processes on Windows, macOS, Linux, iOS, Android.",
+    tags: ["dynamic","instrumentation","hooking","mobile"],
+    lang: "C", langColor: "#555599",
+    stars: "16.1k",
+    github: "https://github.com/frida/frida",
+    url: "https://frida.re"
+  },
+  {
+    name: "Rizin",
+    cat: "reverse",
+    desc: "UNIX-like reverse engineering framework and command-line toolset. Fork of radare2 focusing on usability and modern development practices.",
+    tags: ["disassembler","debugger","UNIX","fork"],
+    lang: "C", langColor: "#555599",
+    stars: "2.8k",
+    github: "https://github.com/rizinorg/rizin",
+    url: "https://rizin.re"
+  },
+
+  // ── CLOUD / CONTAINER ─────────────────────────────────────────
+  {
+    name: "Trivy",
+    cat: "cloud",
+    desc: "Comprehensive vulnerability scanner for containers, filesystems, and IaC. Finds OS packages, language libraries, and misconfigurations.",
+    tags: ["container","IaC","CVE","Docker"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "24.1k",
+    github: "https://github.com/aquasecurity/trivy",
+    url: "https://trivy.dev"
+  },
+  {
+    name: "Falco",
+    cat: "cloud",
+    desc: "Cloud-native runtime security. Parses Linux kernel system calls for runtime anomaly detection in containers, Kubernetes, and cloud deployments.",
+    tags: ["Kubernetes","runtime","syscall","cloud-native"],
+    lang: "C++", langColor: "#f34b7d",
+    stars: "7.7k",
+    github: "https://github.com/falcosecurity/falco",
+    url: "https://falco.org"
+  },
+  {
+    name: "Prowler",
+    cat: "cloud",
+    desc: "Open-source security tool for AWS, Azure, and GCP auditing. Checks for CIS benchmarks, GDPR, HIPAA, and hundreds of security best practices.",
+    tags: ["AWS","Azure","GCP","compliance"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "11.2k",
+    github: "https://github.com/prowler-cloud/prowler",
+    url: "https://prowler.pro"
+  },
+  {
+    name: "ScoutSuite",
+    cat: "cloud",
+    desc: "Multi-cloud security auditing tool for AWS, Azure, GCP, Alibaba Cloud, and Oracle. Generates an interactive report with security findings.",
+    tags: ["multi-cloud","audit","compliance","report"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "6.3k",
+    github: "https://github.com/nccgroup/ScoutSuite",
+    url: "https://github.com/nccgroup/ScoutSuite"
+  },
+  {
+    name: "kube-bench",
+    cat: "cloud",
+    desc: "Runs CIS Kubernetes Benchmark checks to ensure clusters are deployed securely according to industry best practices.",
+    tags: ["Kubernetes","CIS","benchmark","hardening"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "7.1k",
+    github: "https://github.com/aquasecurity/kube-bench",
+    url: "https://github.com/aquasecurity/kube-bench"
+  },
+
+  // ── SOCIAL ENGINEERING ────────────────────────────────────────
+  {
+    name: "Social-Engineer Toolkit",
+    cat: "social",
+    desc: "Open-source penetration testing framework designed for social engineering attacks. Includes phishing, credential harvesting, and payload delivery.",
+    tags: ["phishing","spear-phishing","credential","harvesting"],
+    lang: "Python", langColor: "#3572A5",
+    stars: "11.3k",
+    github: "https://github.com/trustedsec/social-engineer-toolkit",
+    url: "https://trustedsec.com"
+  },
+  {
+    name: "GoPhish",
+    cat: "social",
+    desc: "Open-source phishing framework to test organizational exposure to phishing attacks. Features campaign management, email tracking, and detailed statistics.",
+    tags: ["phishing","campaigns","tracking","awareness"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "12.9k",
+    github: "https://github.com/gophish/gophish",
+    url: "https://getgophish.com"
+  },
+  {
+    name: "Evilginx2",
+    cat: "social",
+    desc: "Man-in-the-middle attack framework for phishing credentials and session cookies, bypassing 2FA. Uses reverse proxy to capture auth tokens.",
+    tags: ["MITM","2FA-bypass","proxy","session"],
+    lang: "Go", langColor: "#00ADD8",
+    stars: "11.2k",
+    github: "https://github.com/kgretzky/evilginx2",
+    url: "https://breakdev.org/evilginx-2"
+  },
+
+  // ── CRYPTOGRAPHY ─────────────────────────────────────────────
+  {
+    name: "OpenSSL",
+    cat: "crypto",
+    desc: "Full-featured toolkit for TLS/SSL protocols and cryptographic library. Essential for certificate management, encryption testing, and key generation.",
+    tags: ["TLS","SSL","certificates","PKI"],
+    lang: "C", langColor: "#555599",
+    stars: "25.4k",
+    github: "https://github.com/openssl/openssl",
+    url: "https://www.openssl.org"
+  },
+  {
+    name: "GnuPG",
+    cat: "crypto",
+    desc: "Complete and free implementation of the OpenPGP standard. Encrypt, decrypt, sign, and verify files and communications with public key cryptography.",
+    tags: ["PGP","encryption","signing","keys"],
+    lang: "C", langColor: "#555599",
+    stars: "4.2k",
+    github: "https://github.com/gpg/gnupg",
+    url: "https://gnupg.org"
+  },
+  {
+    name: "CyberChef",
+    cat: "crypto",
+    desc: "Web app for encryption, encoding, compression, and data analysis. Over 300 operations chained together with a drag-and-drop recipe interface.",
+    tags: ["encoding","decoding","analysis","recipes"],
+    lang: "JavaScript", langColor: "#f1e05a",
+    stars: "29.2k",
+    github: "https://github.com/gchq/CyberChef",
+    url: "https://gchq.github.io/CyberChef"
+  },
+  {
+    name: "HashDeep",
+    cat: "crypto",
+    desc: "Compute, compare, and audit file hashes using multiple algorithms simultaneously. Useful for forensic verification and integrity checking.",
+    tags: ["hashing","integrity","forensics","audit"],
+    lang: "C", langColor: "#555599",
+    stars: "562",
+    github: "https://github.com/jessek/hashdeep",
+    url: "https://github.com/jessek/hashdeep"
+  },
+  {
+    name: "Steghide",
+    cat: "crypto",
+    desc: "Steganography tool for hiding data in image and audio files. Supports JPEG, BMP, WAV, and AU with optional passphrase encryption.",
+    tags: ["steganography","JPEG","BMP","hide"],
+    lang: "C++", langColor: "#f34b7d",
+    stars: "847",
+    github: "https://github.com/StefanoDeVuono/steghide",
+    url: "https://steghide.sourceforge.net"
+  }
+];
+
+// ─── RENDER ───────────────────────────────────────────────────────────
+const grid    = document.getElementById('toolsGrid');
+const counter = document.getElementById('visibleCount');
+const total   = document.getElementById('totalCount');
+const noRes   = document.getElementById('noResults');
+
+let activeFilter = 'all';
+let searchTerm   = '';
+
+function animNum(el, target) {
+  let cur = 0;
+  const step = Math.ceil(target / 40);
+  const timer = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = cur;
+    if (cur >= target) clearInterval(timer);
+  }, 30);
+}
+
+function langColor(lang) {
+  const map = { 'Python':'#3572A5','C':'#555599','C++':'#f34b7d','Go':'#00ADD8',
+    'Java':'#b07219','Ruby':'#701516','Perl':'#0298c3','Rust':'#dea584',
+    'Bash':'#89e051','Shell':'#89e051','JavaScript':'#f1e05a','C#':'#178600','Text':'#777' };
+  return map[lang] || '#888';
+}
+
+function renderTools() {
+  const filtered = TOOLS.filter(t => {
+    const matchCat  = activeFilter === 'all' || t.cat === activeFilter;
+    const q         = searchTerm.toLowerCase();
+    const matchSearch = !q ||
+      t.name.toLowerCase().includes(q) ||
+      t.desc.toLowerCase().includes(q) ||
+      t.tags.some(tag => tag.toLowerCase().includes(q)) ||
+      t.cat.toLowerCase().includes(q);
+    return matchCat && matchSearch;
+  });
+
+  grid.innerHTML = '';
+  noRes.style.display = filtered.length ? 'none' : 'block';
+  counter.textContent = `${filtered.length} tools`;
+
+  filtered.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = `tool-card cat-${t.cat}`;
+    card.style.animationDelay = `${i * 0.03}s`;
+
+    const catLabel = {
+      network:'Network', web:'Web App', exploit:'Exploitation',
+      forensics:'Forensics', malware:'Malware Analysis', osint:'OSINT',
+      password:'Password', wireless:'Wireless', reverse:'Reverse Eng.',
+      cloud:'Cloud/Container', social:'Social Eng.', crypto:'Crypto'
+    }[t.cat] || t.cat;
+
+    const tagsHTML = t.tags.map(tg => `<span class="tag">#${tg}</span>`).join('');
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="card-name-wrap">
+          <div class="tool-name">${t.name}</div>
+          <span class="tool-category">${catLabel}</span>
+        </div>
+        <div class="card-actions">
+          <a class="card-link" href="${t.github}" target="_blank" title="GitHub">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+          </a>
+          <a class="card-link" href="${t.url}" target="_blank" title="Website">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <p class="tool-desc">${t.desc}</p>
+      <div class="card-tags">${tagsHTML}</div>
+      <div class="card-footer">
+        <div class="card-lang">
+          <span class="lang-dot" style="background:${langColor(t.lang)}"></span>
+          ${t.lang}
+        </div>
+        <div class="card-stars">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          ${t.stars}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// Init
+animNum(total, TOOLS.length);
+renderTools();
+
+// Filter buttons
+document.getElementById('filterBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = btn.dataset.cat;
+  renderTools();
+});
+
+// Search
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchTerm = e.target.value;
+  renderTools();
+});
+</script>
+</body>
+</html>
